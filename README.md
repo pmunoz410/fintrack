@@ -1,75 +1,99 @@
-# React + TypeScript + Vite
+# 💰 FinTrack
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dashboard de finanzas personales construido con React y TypeScript. Permite registrar ingresos y gastos, visualizar tendencias con gráficos, y controlar un presupuesto mensual por categoría — todo persistido localmente en el navegador.
 
-Currently, two official plugins are available:
+🔗 **[Ver demo en vivo](https://fintrack-pm.vercel.app)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+![Preview](public/preview.png)
 
-## React Compiler
+## 📌 Sobre el proyecto
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+FinTrack simula una aplicación real de control de gastos personales, sin necesidad de backend: toda la información se guarda en `localStorage`, por lo que persiste entre sesiones sin requerir cuenta ni servidor.
 
-## Expanding the ESLint configuration
+Este proyecto forma parte de mi portafolio como Full Stack Developer, un conjunto de proyectos donde cada uno demuestra una habilidad distinta — desde maquetación semántica y JavaScript vanilla, hasta aplicaciones interactivas con React como esta.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+> [!NOTE]
+> Los datos se guardan únicamente en tu navegador (`localStorage`). Si limpias el caché o cambias de navegador, la información no se transfiere.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ✨ Funcionalidades
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Registro de transacciones** (ingresos y gastos) con categoría, descripción y fecha
+- **Dashboard de resumen** con ingresos, gastos y balance del mes actual
+- **Gráficos interactivos**: distribución de gastos por categoría y tendencia de ingresos vs gastos de los últimos 6 meses
+- **Presupuesto mensual** por categoría, con barras de progreso que alertan al superar el límite
+- **Filtros** por tipo de transacción y categoría
+- **Paginación** del historial de transacciones
+- **Diseño responsive**: sidebar en desktop/tablet, barra de navegación inferior en mobile
+- **Persistencia local** vía `localStorage`, sin necesidad de backend
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🛠️ Tecnologías
+
+- React + TypeScript
+- Vite
+- Tailwind CSS v4
+- Recharts (gráficos)
+- pnpm
+
+## 📂 Estructura del proyecto
 
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+fintrack/
+├── src/
+│   ├── components/
+│   │   └── layout/         # Sidebar, Header
+│   ├── features/
+│   │   ├── transactions/   # formulario, lista, filtros, paginación
+│   │   ├── budget/          # presupuesto y barras de progreso
+│   │   └── dashboard/       # cards de resumen y gráficos
+│   ├── hooks/
+│   │   └── useLocalStorage.ts
+│   ├── data/
+│   │   └── categories.ts
+│   ├── types/
+│   │   └── index.ts
+│   ├── utils/
+│   │   └── formatters.ts
+│   ├── App.tsx
+│   └── main.tsx
+│
+├── vite.config.ts
+├── package.json
+└── README.md
 ```
+
+## 🚀 Cómo correrlo localmente
+
+```bash
+git clone https://github.com/tu-usuario/fintrack.git
+cd fintrack
+pnpm install
+pnpm run dev
+```
+
+## 🎨 Decisiones de diseño
+
+- **Categorías fijas en código** (no editables por el usuario en este MVP) para evitar datos huérfanos si se elimina una categoría con transacciones asociadas.
+- **`items-start` en el grid** del formulario y la lista de transacciones, para que el formulario no se estire junto con una lista larga — cada elemento mantiene su altura natural.
+- **Fecha calculada en hora local**, no con `toISOString()` (que devuelve UTC), para evitar que el formulario precargue la fecha del día siguiente cerca de la medianoche.
+- **Paginación en vez de scroll infinito**, ya que en un dashboard financiero el usuario se beneficia de tener referencia clara de en qué "página" de su historial está.
+
+> [!TIP]
+> Si vas a probar la app desde cero, agrega algunas transacciones con fechas de meses anteriores para ver el gráfico de tendencia (Ingresos vs Gastos) con más de un mes de datos.
+
+> [!IMPORTANT]
+> El componente `Cell` de Recharts está marcado como deprecado (se removerá en su v4.0), pero se mantiene intencionalmente en este proyecto porque el reemplazo oficial (`shape`/`content`) aún no tiene una migración estable sin pérdida de funcionalidad (colores del legend). Se revisará al actualizar la dependencia a una versión mayor.
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT — ver el archivo [LICENSE](LICENSE) para más detalles.
+
+## 👤 Autor
+
+**Paul Muñoz**
+
+Full Stack Developer — Java · Spring Boot · React · TypeScript
+
+> [!NOTE]
+> Cualquier feedback o sugerencia es bienvenido.
+
+⭐ Si este proyecto te resulta interesante, ¡no dudes en darle una estrella al repositorio!
